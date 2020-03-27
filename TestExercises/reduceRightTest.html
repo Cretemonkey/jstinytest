@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>reduceRight Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.reduceRight(callback(accumulator, currentValue[, index[, array]])[, initialValue])
+
+// Arguments: 
+//  callback: Function to execute on each value in the array.
+//  accumulator: Initial value (if supplied), then the value previously returned in the last run of the callback (previousValue - resultSoFar).
+//  currentValue: The current element being processed in the array.
+//  index: The position of the current element being processed in the array.
+//  array: The originalArray reduceRight() was called on.
+//  initialValue: Value of the accumulator for the first call of the callback. If no initial value the last element in the array (at the last index, remember it's right to left) will be used as accumulator and skipped as a currentValue.
+
+// Return: The reduceRight() method applies a function against an accumulator and each value of the array (from right-to-left) to reduce it to a single value.
+
+// Example (no initial value): var array = [1, 2, 3]
+// return 3 + 2 = 5
+// return 5 + 1 = 6
+
+// If initial value, callback should run array.length times.
+// If no initial value, callback should run array.length -1 times.
+// If initialValue, previousValue should start with initialValue.
+// If initialValue, currentValue should start with array[0].
+// If initialValue, callback should start at index 0.
+// If no initialValue, previousValue should start with array[0].
+// If no initialValue, currentValue should start with array[1].
+// If no initialValue, callback will start at index 1.
+// If initialValue and an empty array, it should return initialValue without running callback.
+// If no initialValue and one value in array, it should return the single value without running callback.
+// It should reduce.
+// If initialValue, it should exclude holes.
+// If no initialValue, it should exclude holes.
+// It should pass array as fourth arguement to callback.
+// If no initialValue and an empty array, it should return typeError (Uncaught TypeError: Reduce of empty array with no initial value at Array.reduceRight).
+
+function reduceRight(array, callback, initialValue) {
+  var length = array.length;
+  var startingIndex = array.length -1;
+  var resultSoFar = initialValue;
+  var arrayIndexes = Object.keys(array);
+
+  if (arguments.length < 3) {
+    resultSoFar = array[startingIndex];
+    startingIndex--;
+  };
+
+  if (arrayIndexes.length === 0 && startingIndex < length -1) {
+      throw new TypeError('Reduce of empty array with no initial value');
+  }  
+  
+  for(var i = startingIndex; i >= 0; i--) {
+    if (i in array) {
+      resultSoFar = callback(resultSoFar, array[i], i, array);
+    };
+  }
+    return resultSoFar;
+};
+
+tests({
+'If initial value, callback should run array.length times.': function() {
+var numberOfTimesRun = 0;
+
+reduceRight([1, 2], function() {
+  numberOfTimesRun++;
+}, 0);
+  eq(numberOfTimesRun, 2);
+},
+'If no initial value, callback should run array.length -1 times.': function() {
+  var numberOfTimesRun = 0;
+
+  reduceRight([1, 2], function() {
+    numberOfTimesRun++;
+  });
+    eq(numberOfTimesRun, 1);
+},
+'If initialValue, previousValue should start with initialValue.': function() {
+  reduceRight([1], function(previousValue) {
+    eq(previousValue, 0);
+  }, 0);
+},
+'If initialValue, currentValue should start with last element of array.': function() {
+  reduceRight([1, 2], function(previousValue, currentValue) {
+    return currentValue;
+    eq(currentValue, 2);
+  }, 0);
+},
+'If initialValue, callback should start at last index of array.': function() {
+  reduceRight([1, 2], function(previousValue, currentValue, currentIndex) {
+    return currentValue;
+    eq(currentIndex, 1);
+  }, 0);
+},
+'If no initialValue, previousValue should start with last element of array.': function() {
+  reduceRight([1, 2], function(previousValue) {
+    eq(previousValue, 2);
+  });
+},
+'If no initialValue, currentValue should start with second to last element of array.': function() {
+  reduceRight([1, 2], function(previousValue, currentValue) {
+    eq(currentValue, 1);
+  });
+},
+'If no initialValue, callback will start at second to last index.': function() {
+  reduceRight([1, 2], function(previousValue, currentValue, currentIndex) {
+    eq(currentIndex, 0);
+  });
+},
+'If initialValue and an empty array, it should return initialValue without running callback.': function() {
+  var numberOfTimesRun = 0;
+  var initialValue = 1;
+  
+  var result = reduceRight([,,], function() {
+    numberOfTimesRun++;
+  }, 1);
+    eq(result, initialValue);
+    eq(numberOfTimesRun, 0);
+},
+'If no initialValue and one value in array, it should return the single value without running callback.': function() {
+  var numberOfTimesRun = 0;
+
+  var result = reduceRight([1], function() {
+    numberOfTimesRun++;
+  });
+    eq(result, 1);
+    eq(numberOfTimesRun, 0);
+},
+'It should reduce.': function() {
+  var sum = reduceRight([,1,, 2, 3,], function (a, b) {
+    return a + b;
+  }, 0);
+  eq(sum, 6);
+},
+'If initialValue, it should exclude holes.': function() {
+  var numberOfTimesRun = 0;
+  
+  reduceRight([ ,1 , ,2, ], function(previousValue) {
+    numberOfTimesRun++;
+  }, 0);
+  eq(numberOfTimesRun, 2);
+},
+'If no initialValue, it should exclude holes.': function() {
+  var numberOfTimesRun = 0;
+  
+  reduceRight([ ,1 , ,2, ], function(previousValue) {
+    numberOfTimesRun++;
+  });
+  eq(numberOfTimesRun, 1);
+},
+'It should pass array as fourth arguement to callback.': function() {
+  var testArray = [1, 2];
+  reduceRight(testArray, function(previousValue, currentValue, currentIndex, array) {
+    eq(testArray, array);
+});
+},
+'If no initialValue and an empty array, it should return typeError (Uncaught TypeError: Reduce of empty array with no initial value at Array.reduceRight).': function() {
+  var isTypeError = false;
+
+  try {
+    reduceRight([], function() {});
+  } catch(e) {
+    isTypeError = (e instanceof TypeError);
+  }
+  eq(isTypeError, true);
+},
+});
+</script>
+</body>
+</html>

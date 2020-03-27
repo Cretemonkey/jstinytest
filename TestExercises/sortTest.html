@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>sort Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// The sort() method sorts the elements of an array in place and returns the sorted array. The default sort order is ascending, built upon converting the elements into strings, then comparing their sequences of UTF-16 code units values.
+
+// Syntax: arr.sort([compareFunction])
+
+// Parameters:
+// compareFunction: [Optional] Specifies a function that defines the sort order. If omitted, the array elements are converted to strings, then sorted according to each character's Unicode code point value.
+// firstEl: The first element for comparison.
+// secondEl: The second element for comparison.
+
+// Return: The sorted array. Note that the array is sorted in place, and no copy is made.
+
+// It should sort the elements of an array in place and return the sorted array, not a copy.
+// If compareFunction is not supplied, it should sort all non-undefined array elements by converting them to strings and comparing strings in UTF-16 code units order.
+// If compareFunction is not supplied, it should sort all non-undefined text strings in ascending order alphabetically.
+// It should sort all undefined elements to the end of the array.
+// It should return elements in a mixed array (e.g. string or number) as the same typeof.
+// If compareFunction is supplied, it should sort all non-undefined array elements according to the return value of the compare function.
+// It should sort objects given the value of one of their properties with a compareFunction.
+// If compareFunction is supplied, it should sort a mix of numbers and numbers as strings.
+// If no compareFunction is supplied, it should sort a mix of numbers and numbers as strings. 
+
+function sortTest(array, compareFunc) {
+var tempArray = [];
+
+if (compareFunc === undefined) {
+    for(var s = 0; s < array.length; s++) {
+      if (typeof array[s] !== "string") {
+        array[s] = JSON.stringify(array[s]);
+        tempArray.push(array[s]);
+      }
+      };
+}
+
+for(var i = 1; i < array.length; i++) {
+  var index = array[i];
+  var endPos = array.length -1;
+  var j = i;
+
+  if (compareFunc !== undefined) {
+    var compare = compareFunc(index, array[j-1]);
+  }
+
+  if (index === undefined) {
+    index = array[endPos];
+    array[endPos] = array[j];
+    array[j] = index;
+  }
+
+  if (compareFunc === undefined) {
+    while (j > 0 && array[j-1] > index) {
+      array[j] = array[j-1];
+      j--;
+    }
+    array[j] = index;
+  }
+  
+  if (array[j-1] > index) {
+    while (j > 0 && array[j-1] > index) {
+    array[j] = array[j-1];
+    j--;
+    }
+      }else if (compare < 0) {
+        while (j > 0 && compare < 0) {
+        array[j] = array[j-1];
+        j--;
+        }
+      }else if (compare > 0) {
+          index = array[i-1];
+          array[j-1] = array[j];
+          j--;
+        }
+        array[j] = index;
+} 
+
+for(var s = 0; s < array.length; s++) {
+  if (typeof array[s] === "string" && tempArray.includes(array[s])) {
+    array[s] = JSON.parse(array[s]);
+  }
+};
+  return array;
+};
+
+tests({
+'It should sort the elements of an array in place and return the sorted array, not a copy.': function() {
+  var testArray = [34, 15, 22];
+  var result = sortTest(testArray);
+  eq(result, testArray);
+},
+'If compareFunction is not supplied, it should sort all non-undefined array elements by converting them to strings and comparing strings in UTF-16 code units order.': function() {
+  var testArray = [34, 15, 22];
+  sortTest(testArray);
+  eq(testArray[0], 15);
+  eq(testArray[1], 22);
+  eq(testArray[2], 34);
+},
+'If compareFunction is not supplied, it should sort all non-undefined text strings in ascending order alphabetically.': function() {
+  var testArray = ["coke", "mike", "amp"];
+  sortTest(testArray);
+  eq(testArray[0], "amp");
+  eq(testArray[1], "coke");
+  eq(testArray[2], "mike");
+},
+'It should sort all undefined elements to the end of the array.': function() {
+  var testArray = [3, , 2];
+  sortTest(testArray);
+  eq(testArray[0], 2);
+  eq(testArray[1], 3);
+  eq(testArray[2], undefined);
+},
+'It should return elements in a mixed array (e.g. string or number) as the same typeof.': function() {
+  var testArray = [34, 15, "22"];
+  sortTest(testArray);
+  eq(testArray[0], 15);
+  eq(typeof testArray[0], "number");
+  eq(testArray[1], "22");
+  eq(testArray[2], 34);
+  eq(typeof testArray[2], "number");
+},
+'If compareFunction is supplied, it should sort all non-undefined array elements according to the return value of the compare function.': function() {
+  var testArray = [34, 15, 22];
+  sortTest(testArray, function(a, b) {
+    return a - b;
+  });
+  eq(testArray[0], 15);
+  eq(testArray[1], 22);
+  eq(testArray[2], 34);
+},
+'It should sort objects given the value of one of their properties with a compareFunction.': function() {
+  var objArray = [{maker: "Yamaha", cc: 750}, {maker: "Honda", cc: 450}, {maker: "Victory", cc: 1500}];
+  sortTest(objArray, function(a, b) {
+    return a.cc - b.cc;
+  });
+  eq(objArray[0].cc, 450);
+  eq(objArray[1].cc, 750);
+  eq(objArray[2].cc, 1500);
+},
+'If no compareFunction is supplied, it should sort a mix of numbers and numbers as strings.': function() {
+  var testArray = ["22", 15, 38];
+  eq(testArray[0], "22");
+  eq(testArray[1], 15);
+  eq(testArray[2], 38);
+},
+'If compareFunction is supplied, it should sort a mix of numbers and numbers as strings.': function() {
+  var testArray = ["22", 15, 18];
+  sortTest(testArray, function(a, b) {
+    return a - b;
+  });
+  eq(testArray[0], 15);
+  eq(testArray[1], 18);
+  eq(testArray[2], "22");
+},
+'If no compareFunction, it should sort word strings taking capitalization into account': function() {
+  var testArray = ["George", "mIke", "bob"];
+  sortTest(testArray);
+  eq(testArray[0], "George");
+  eq(testArray[1], "bob");
+  eq(testArray[2], "mIke");
+},
+});
+</script>
+</body>
+</html>

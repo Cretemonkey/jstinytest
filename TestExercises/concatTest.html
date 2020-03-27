@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>concat Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: const new_array = old_array.concat([value1[, value2[, ...[, valueN]]]])
+
+// Arguments: value N (optional). Arrays and/or values to concatenate into a new array.
+
+// Return: The concat method creates a new array consisting of the elements in the object on which it is called, followed in order by, for each argument, the elements of that argument (if the argument is an array) or the argument itself (if the argument is not an array). It does not recurse into nested array arguments.
+
+//It should return an array.
+//It should return a new array.
+//It should not change the arrays being concatenated.
+//It should return a new array the length of all arrays passed into function.
+//It should return a new single array containing the values of the original arrays in order of the arguments.
+//If an argument is not an Object reference, a value changed in the newArray will not change in the originalArray. A value in the new array (the copy) can be changed and it will not change the value in the original arrays unless it is an Object reference.
+//If an argument is an Object reference both the original and new array refer to the same object and a value changed in the newArray will also change in the originalArray. That is, if a referenced object is modified, the changes are visible to both the new and original arrays. This includes elements of array arguments that are also arrays.
+//It should not flatten nested arrays.
+//concat copies object references, not the actual Object, into the new array. 
+//concat copies the values of strings and numbers into the new array, not Objects.
+
+function concatTest() {
+  var newArray = [];
+
+  for(var i = 0; i < arguments.length; i++) {
+ 	var thisArgument = arguments[i];
+
+  if(Array.isArray(thisArgument)) {
+	  for(var a = 0; a < thisArgument.length; a++) {
+	    newArray.push(thisArgument[a]);
+    }
+    }else{
+      newArray.push(thisArgument);
+    } 
+  }	
+	return newArray;
+};
+
+tests({
+'It should return an array.': function() {
+  var array1 = [1];
+  var array2 = [6];
+
+  var testArray = concatTest(array1, array2);
+    eq(Array.isArray(testArray), true);
+},
+'It should return a new array.': function() {
+  var array1 = [1, 6];
+
+  var testArray = concatTest(array1);
+    eq(testArray !== array1, true);
+},
+'It should return a new array the total length of all arrays passed into function.': function() {
+  var array1 = [1];
+  var array2 = [6];
+
+  var testArray = concatTest(array1, array2);
+    eq(testArray.length, 2);
+},
+'It should return a new single array containing the values of the original arrays in order of the arguments.': function() {
+  var array1 = [1];
+  var array2 = [6];
+
+  var testArray = concatTest(array1, array2);
+  eq(testArray, array1 + ',' + array2)
+},
+'It should not skip holes.': function() {
+  var testArray = concatTest([1, , 3]);
+  eq(testArray.length, 3);
+},
+'If an argument is not an Object reference, a value changed in the newArray will not change in the originalArray.': function() {
+  var array1 = [1];
+  //Review documentation to make sure this test is correct.
+  var testArray = concatTest(array1);
+  eq(array1[0], 1);
+  testArray[0] = 2;
+  eq(array1[0], 1); 
+},
+'If an argument is an Object reference, both the original array and newArray refer to the same object and a value changed in the referenced object will also change in the newArray.': function() {
+  var valueObj = {first: 1};
+  var ref = valueObj;
+  //Review
+  var testArray = concatTest(ref);  
+  eq(testArray[0].first, 1);
+  valueObj.first = 5;
+  eq(testArray[0].first, 5);
+},
+'It should not flatten nested arrays.': function() {
+  var array1 = [1, [2]];
+
+  var testArray = concatTest(array1);
+  eq(testArray[0], 1);
+  eq(testArray[1][0], 2);
+  eq(testArray.length, 2);
+},
+'It should copy the values of strings and numbers into the new array.': function() {
+  var array1 = ['Mike', 1];
+
+  var testArray = concatTest(array1);
+  eq(typeof testArray[0], 'string');
+  eq(typeof testArray[1], 'number');
+},
+});
+</script>
+</body>
+</html>

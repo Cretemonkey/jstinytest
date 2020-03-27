@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>fill Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// The fill() method changes all elements in an array to a static value, from a start index (default 0) to an end index 
+// (default array.length). It returns the modified array.
+
+// Syntax: arr.fill(value[, start[, end]])
+
+//Parameters: 
+// value: Value to fill the array with. (Note all elements in the array will be this exact value.)
+// start (Optional): Start index, default 0.
+// end (Optional): End index, default arr.length.
+
+// Return: The modified array, filled with value.
+
+// It should use the valueFill argument as the fill value.
+// It should fill the array beginning at the startFill index.
+// It should fill the array through to the index before the endFill entered.
+// It should return the modified original array, not a copy.
+// It should work with holes in the original array.
+// It should work with primitives, it is not neccessary that the this value be an array object
+// If start is negative, start = array.length + start.
+// If end is negative end = array.length + end.
+// If no value is entered it should return undefined array.length times.
+// If no end index is entered it should fill the array from start index to array.length.
+// If no start and end indexes are entered it should fill the array with the value argument.
+// If the first parameter is an object, it will copy its reference and fill the array with references to that object.
+
+function fillTest(array, valueFill, startFill, endFill) {
+  var startIndex = startFill;
+  var endIndex = endFill;
+
+  if (endFill < 0) {
+    endIndex = array.length + endFill;
+  }
+
+  if (endFill === undefined) {
+    endIndex = array.length;
+  }
+
+  if (startIndex === undefined){
+    startIndex = 0;
+  }
+
+  for(var i = startIndex; i < endIndex; i++) {
+      array[i] = valueFill;
+    }
+    return array;
+}
+
+tests({
+'It should use the valueFill argument as the fill value.': function() {
+  var testObj = [1, 2];
+  fillTest(testObj, 5, 0, 1);
+  eq(testObj[0], 5);
+},
+'It should fill the array beginning at startFill index.': function() {   
+  var testObj = [1, 2, 3];
+  fillTest(testObj, 5, 0, 2);
+  eq(testObj[0], 5);
+},
+'It should fill the array through to the index before the endFill entered.': function() {
+  var testObj = [1, 2, 3];
+  fillTest(testObj, 5, 0, 2);
+  eq(testObj[1], 5);
+  eq(testObj[2], 3); 
+},
+'It should return the modified original array, not a copy.': function() {
+  var testObj = [1, 2, 3];
+  var testEquals = fillTest(testObj, 5, 0, 2);
+  eq(testObj[1], testEquals[1]);
+},
+'It should work with holes in the original array.': function() {
+  var testObj = [,,];
+  fillTest(testObj, 5, 0, 1);
+  eq(testObj[0], 5);
+  eq(testObj[1], undefined);
+},
+'It should work with primitives, it is not neccessary that the this value be an array object': function() {
+  var testObj = [1];
+  fillTest(testObj, 'mike', 0, 1);
+  eq(testObj, 'mike');
+},
+'If start is negative, start = array.length + start.': function() {
+  var testObj = [0, 1, 2];
+  fillTest(testObj, 5, -2, 2);
+  eq(testObj[0], 5);
+  eq(testObj[1], 5);
+  eq(testObj[2], 2);
+},
+'If end is negative end = array.length + end.': function() {
+  var testObj = [0, 1, 2];
+  fillTest(testObj, 5, 0, -2);
+  eq(testObj[0], 5);
+  eq(testObj[1], 1);
+  eq(testObj[2], 2);
+},
+'If no value is entered it should return undefined array.length times.': function() {
+  var testObj = [1];
+  fillTest(testObj);
+  eq(testObj[0], undefined);
+},
+'If no end index is entered it should fill the array from start index to array.length.': function() {
+  var testObj = [1, 2];
+  fillTest(testObj, 5, 0);
+  eq(testObj[0], 5);
+  eq(testObj[1], 5);
+},
+'If no start and end indexes are entered it should fill the array with the value argument.': function() {
+  var testObj = [1, 2];
+  fillTest(testObj, 5);
+  eq(testObj[0], 5);
+  eq(testObj[1], 5);
+},
+'If the first parameter is an object, it should copy its reference and fill the array with references to that object.': function() {
+  var testObj = fillTest(Array(2), {});
+  testObj[0].name = 'mike';
+  eq(testObj[0].name, testObj[1].name);
+},
+'It should be able to work on an array-like object': function() {
+  var testObj = fillTest({length: 2}, 2); //Creates an array-like object with length = 2 and valueFill = 2
+  eq(testObj[0], 2);
+  eq(testObj[1], 2);
+},
+});
+</script>
+</body>
+</html>

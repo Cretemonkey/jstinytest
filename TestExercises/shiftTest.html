@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>shift Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.shift()
+
+// Return: The removed element from the array; undefined if the array is empty.
+
+// It should remove the first element from an array.
+// It should return the removed element from the array.
+// It should return undefined if the array is empty.
+// It should be able to use .apply on objects resembling arrays. 
+// It should be able to use .call on objects resembling arrays.
+
+Array.prototype.shiftThis = function() {
+  var length = this.length;
+  var shiftValue = this[0];
+
+  for(var i = 0; i < length; i++) {
+    this[i] = this[i + 1];
+}
+  if (this.length < 1) {
+    return shiftValue;
+  }
+  this.length = this.length -1;
+
+  return shiftValue;
+};  
+
+tests({
+'It should remove the first element from an array.': function() {
+  var testObj = [2, 3];
+  testObj.shiftThis();
+  eq(testObj, 3);
+},
+'It should return the removed element from the array.': function() {   
+  var testObj = [2, 3];
+  var result = testObj.shiftThis();
+  eq(result, 2);
+},
+'It should return undefined if the array is empty.': function() {
+  var testObj = [];
+  var result = testObj.shiftThis();
+  eq(result, undefined);
+},
+'It should be able to use .apply on objects resembling arrays.': function() {
+  var myObj = {
+    0: 'mike',
+    1: 'george',
+    length: 2,
+  };
+  var shiftApply = Array.prototype.shiftThis.apply(myObj);
+  eq(shiftApply, 'mike');
+},
+'It should be able to use .call on objects resembling arrays.': function() {
+  var myObj = {
+    0: 'mike',
+    1: 'george',
+    length: 2,
+  };
+  var shiftCall = Array.prototype.shiftThis.call(myObj);
+  eq(shiftCall, 'mike');
+},
+});
+</script>
+</body>
+</html>

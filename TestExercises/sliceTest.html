@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>slice Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.slice([begin[, end]])
+
+// Parameters:
+// begin [optional]: Zero-based index at which to begin extraction to new array.
+// end [optional]: Zero-based index before which to end extraction. Slice extracts up to but not including end.
+
+// Return: A new array containing the extracted elements.
+
+// If beginIndex and endIndex are not defined it should copy all originalArray values to newArray.
+// It should return a copy of the originalArray as a newArray.
+// It should return a copy of the portion of the originalArray as a newArray defined by beginIndex and endIndex.
+// If beginIndex is undefined slice() should begin from index 0.
+// If beginIndex is negative it indicates an offset from the end of originalArray.
+// If beginIndex is >= orginalArray.length it should return an empty newArray.
+// If endIndex is not defined slice() should extract all values from beginIndex inluding the last index.
+// If endIndex is defined it should not include endIndex in newArray.
+// If endIndex is negative it indicates an offset from the end of originalArray.
+// If endIndex is > originalArray.length slice() should extract all values from beginIndex including the last index.
+// It should copy object references into the new array.
+// If a referenced object changes, the changes are visible to both the new and original arrays.
+// If changes are made to a string, number, or boolean in either the originalArray or newArray the other array is not affected.
+// It should convert Array-like objects to a new Array if slice() is bound to the object.
+
+function slice(originalArray, beginIndex, endIndex) {
+  var newArray = [];
+  var startSlice = 0;
+  var endSlice = originalArray.length
+
+  if (beginIndex > 0) {
+    startSlice = beginIndex;
+  }
+  if (endIndex > 0) {
+    endSlice = endIndex;
+  }
+  if (endIndex < 0) {
+    endSlice = originalArray.length + endIndex;
+  }
+
+  for(var i = startSlice; i < endSlice; i++) {
+    if (i in originalArray && i <= endSlice) {
+    newArray.push(originalArray[i])
+  } 
+}
+return newArray;
+}
+
+
+tests({
+'If beginIndex and endIndex are not defined it should copy all originalArray values to newArray.': function() {
+  var result = slice([1]);
+  eq(result, 1);
+},
+'It should return a newArray containing the extracted elements.': function() {
+  var originalArray = [1];
+  var result = slice(originalArray);
+  eq(result !== originalArray, true);
+},
+'It should return a copy of the portion of the originalArray as a newArray defined by beginIndex and endIndex.': function() {
+  var originalArray = [5, 6, 7, 8];
+  var result = slice(originalArray, 1, 3);
+  eq(result[0], 6);
+  eq(result[1], 7);
+},
+'If beginIndex is undefined slice() should begin from index 0.': function() {
+  var originalArray = [1];
+  var result = slice(originalArray);
+  eq(result = originalArray[0], true);
+},
+'If beginIndex is negative it indicates an offset from the end of originalArray.': function() {
+  var originalArray = [5, 6, 7, 8];
+  var result = slice(originalArray, 0, -2);
+  eq(result, "5,6");
+},
+'If beginIndex is >= orginalArray.length it should return an empty newArray.': function() {
+  var result = slice([1], 1);
+  eq(result, "");
+},
+'If endIndex is not defined slice() should extract all values from beginIndex including the last index.': function() {
+  var result = slice([1, 2], 1);
+  eq(result, 2);
+},
+'If endIndex is defined it should not include endIndex in newArray.': function() {
+  var result = slice([1, 2], 0, 1);
+  eq(result, 1);
+},
+'If endIndex is negative it indicates an offset from the end of originalArray.': function() {
+  var result = slice([1, 2], 0, -1);
+  eq(result, 1);
+},
+'If endIndex is > originalArray.length slice() should extract all values from beginIndex including the last index.': function() {
+  var result = slice([1, 2], 1, 3);
+  eq(result, 2);
+},
+'It should copy object references into the new array.': function() {
+  var valueObj = {first: 1};
+  var ref = [valueObj, 42];
+  var result = slice(ref, 0, 1);
+  eq(result[0].first, 1);
+},
+'If a referenced object changes, the changes are visible to both the new and original arrays.': function() {
+  var valueObj = {first: 1};
+  var ref = [valueObj, 42];
+  var result = slice(ref, 0, 1);
+  eq(result[0].first, 1);
+  valueObj.first = 2;
+  eq(result[0].first, 2);
+  eq(ref[0].first, 2);
+},
+'If changes are made to a string, number, or boolean in either the originalArray or newArray the other array is not affected.': function() {
+  var originalArray = [1];
+  var result = slice(originalArray);
+  originalArray = 2;
+  eq(result, 1);
+  result = 3;
+  eq(originalArray, 2);
+},
+'It should convert Array-like objects to a new Array if slice() is bound to the object.': function() {
+  var slice = Function.prototype.call.bind();
+  function sliceBound() {
+    return [].slice.call(arguments);
+  }
+  var newOriginalArray = sliceBound(1, 2);
+  eq(newOriginalArray[0], 1);
+  eq(newOriginalArray[1], 2);
+},
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Every Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// The every() method tests whether all elements in the array pass the test implemented by the provided function. It returns a Boolean value. 
+
+// Syntax: arr.every(callback(element[, index[, array]])[, thisArg])
+
+//Arguments: 
+// callback; A function to test for each element, taking three arguments:
+// element; The current element being processed in the array.
+// index [Optional]; The index of the current element being processed in the array.
+// array [Optional]; The array every was called upon.
+// thisArg [Optional]; A value to use as this when executing callback.
+
+// Return: true if the callback function returns a truthy value for every array element. Otherwise, false.
+
+// 1. 'It should run callback originalArray.length times if no value is false.'
+// 2. 'It should return true if no value in originalArray is false.'
+// 3. 'It should execute the callback function for each element of originalArray only until the callback returns a falsy value.'
+// 4. 'It should pass in the ith element as the first argument to the callback.'
+// 5. 'It should pass in the ith position as the second argument to the callback.'
+// 6. 'It should return the originalArray as the third argument.'
+// 7. 'If a this argument is passed, it will be used as the this value inside each invocation of the callback.'
+// 8. 'It should return true for an empty array.'
+// 9. 'It should not run callback for positions that don't have assigned values.'
+// 10. 'It should not run callback for positions that have been deleted.'
+// 11. 'It should not change originalArray.'
+// 12. 'It should not run callback for any elements added to the array after the call to every() begins.'
+// 13. 'It should pass the value of existing elements that have been changed at the time callback visits them.'
+
+function every(originalArray, callback, optionalThis) {
+  var everyCallback = callback;
+  var length = originalArray.length;
+
+  if(optionalThis) {
+    everyCallback = callback.bind(optionalThis);
+  };
+
+  for(var i = 0; i < length; i++) {
+
+   if(i in originalArray) { 
+    if(!callback(originalArray[i], i, originalArray)) {
+      return false;
+  };
+ }
+}
+    return true;
+};
+
+tests({
+'It should run callback originalArray.length times if no value is false.': function() {
+  var numberOfTimesCallbackRun = 0;
+  every([1, 2], function(element) {
+    numberOfTimesCallbackRun++;
+    return element < 3;
+  });
+  eq(numberOfTimesCallbackRun, 2);
+},
+'It should pass in the ith element as the first argument to the callback.': function() {
+  every([1], function(element) {
+    eq(element, 1);
+  });
+},
+'It should pass in the ith position as the second argument to the callback.': function() {
+  every([1], function(element, index) {
+    eq(index, 0);
+  });
+}, 
+'It should return the originalArray as the third argument.': function() {
+  var testArray = [1, 2];
+  every(testArray, function(element, index, originalArray) {
+    eq(testArray, originalArray);
+  });
+}, 
+'If a this argument is passed, it will be used as the this value inside each invocation of the callback.': function() {
+  every([], function() {
+    eq(this.name, 'Mike');
+  }, {name: 'Mike'});
+},
+'It should return true if no value in originalArray is false.': function() {
+  var isEvery = every([1], function(element) {
+    return element > 0;
+  });
+  eq(isEvery, true);
+},
+'It should execute the callback function for each element of originalArray only until the callback returns a falsy value.': function () {
+  var numberOfTimesCallbackRun = 0;
+  every([1, 2, 3], function(element) {
+    numberOfTimesCallbackRun++;
+    return element < 2;
+  });
+  eq(numberOfTimesCallbackRun, 2);
+},
+'It should return true for an empty array.': function() {
+  var isEvery = every([], function(element) {
+    return element < 3;
+  });
+    eq(isEvery, true);
+},
+'It should not run callback for positions that do not have assigned values.': function() {
+  var numberOfTimesCallbackRun = 0;
+  every([ , 1], function(element) {
+    numberOfTimesCallbackRun++;
+    return element < 2;
+  });
+    eq(numberOfTimesCallbackRun, 1);
+},
+'It should not change originalArray.': function() {
+  var testArray = [];
+  every(testArray, function(element, index, originalArray) {
+    eq(testArray === originalArray, false);
+  });
+}, 
+'It should not run callback for positions that have been deleted.': function() {
+  var numberOfTimesCallbackRun = 0;
+  var everyArray = [1, 2, 3];
+
+  every(everyArray, function(element) {
+    numberOfTimesCallbackRun++;
+    everyArray.splice(1, 1);
+    return element < 4;
+    
+  });
+  eq(numberOfTimesCallbackRun, 2);
+}, 
+'It should not run callback for any elements added to the array after every() begins.': function() {
+  var numberOfTimesCallbackRun = 0;
+  var everyArray = [1];
+
+  every(everyArray, function(element) {
+    numberOfTimesCallbackRun++;
+    everyArray.push(2);
+    return element < 3;
+  });
+    eq(numberOfTimesCallbackRun, 1);
+},
+'It should pass the value of existing elements that have been changed at the time callback visits them.': function() {
+  var everyArray = [1];
+
+  var isEvery = every(everyArray, function(element) {
+    everyArray[0] = 2;
+    return element > 1;
+    eq(isEvery, true);
+  })
+},
+});
+
+</script>
+</body>
+</html>

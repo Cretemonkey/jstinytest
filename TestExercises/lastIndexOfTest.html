@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>lastIndexOf Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.lastIndexOf(searchElement[, fromIndex])
+
+// Arguments:
+//  searchElement: Element to locate in the array.
+//  fromIndex: The index to start the search at. 
+
+// Return: The lastIndexOf() method returns the last index at which a given element can be found in the array, or -1 if it is not present. The array is searched backwards, starting at fromIndex.
+
+//If fromIndex is not entered array.length -1 should be the default startSearch and it should return the last index of the element.
+//If the element is not present it will return -1.
+//If the calculated index is less than 0, -1 is returned.
+//If the fromIndex is greater than or equal to the array's length, the whole array will be searched.
+//If the provided index value is a negative number, it is taken as the offset from the end of the array.
+//if the provided index is negative, the array is still searched from back to front.
+//It should skip holes.
+//It should use strict equality to return result ('1' !== 1).
+
+function lastIndexOf(array, searchElement, fromIndex) {
+  var startSearch = array.length -1;
+
+  if (typeof fromIndex === 'number' && fromIndex !== startSearch) {
+	  startSearch = fromIndex;
+  }
+
+  if (fromIndex < -1) {
+	  startSearch = array.length +fromIndex;
+  }
+
+  for(var i = startSearch; i >= 0; i--) {
+    if (i in array) {
+      if (array[i] === searchElement) {
+        return i;
+    }
+  }
+  }
+	  return -1;
+};
+
+tests({
+'If fromIndex is not entered, array.length -1 should be the default startSearch and it should return the last index of the element.': function() {
+  var resultIndex = lastIndexOf([3, 3], 3);
+  eq(resultIndex, 1);
+},
+'If the element is not present it will return -1.': function() {
+  var resultIndex = lastIndexOf([3], 4);
+  eq(resultIndex, -1);
+},
+'If the calculated index is less than 0, -1 is returned.': function() {
+  var resultIndex = lastIndexOf([3], 3, -2);
+  eq(resultIndex, -1);
+},
+'If the fromIndex is greater than or equal to the array.length, the whole array will be searched.': function() {
+  var resultIndex = lastIndexOf([3, 3], 3, 3);
+  eq(resultIndex, 1);
+},
+'If the provided fromIndex value is a negative number, it is taken as the offset from the end of the array.': function() {
+  var resultIndex = lastIndexOf([1, 3, 1], 3, -2);
+  eq(resultIndex, 1);
+},
+'If the provided fromIndex value is a negative number, it is taken as the offset from the end of the array.': function() {
+  var array = [1, 2, 3];
+  var resultIndex = lastIndexOf(array, 2, -2);
+  eq(resultIndex, array.length -2);
+},
+'It should skip holes.': function() {
+  var resultIndex = lastIndexOf([,,,], undefined);
+  eq(resultIndex, -1);
+},
+'It should use strict equality to return result.': function() {
+  var resultIndex = lastIndexOf(['3'], 3);
+  eq(resultIndex, -1);
+},
+});
+</script>
+</body>
+</html>

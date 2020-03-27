@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>includes Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.includes(valueToFind[, fromIndex])
+
+// Arguments:
+//  valueToFind: Element to locate in the array.
+//  fromIndex: The index to start the search at. Defaults at 0.
+
+// Return: The includes() method determines whether an array includes a certain value among its entries, returning true or false as appropriate.
+
+//A Boolean which is true if the value valueToFind is found within the array (or the part of the array indicated by the index fromIndex, if specified). Values of zero are all considered to be equal regardless of sign (that is, -0 is considered to be equal to both 0 and +0), but false is not considered to be the same as 0.
+
+//It should return true if the searchValue is in the array.
+//It should return false if the searchValue is not in the array.
+//If fromIndex argument is not entered it should search the array starting at index 0.
+//If fromIndex is entered it should search the array starting at index[fromIndex].
+//If fromIndex is negative it should start searching offset from the end of the array.
+//If fromIndex is equal to or greater than the length of the array it should return false and not search the array.
+//If fromIndex is negative and less than or equal to array.length the entire array will be searched.
+//It should not skip holes.
+//It should use strict equality to return result.
+//It should search array-like objects.
+
+function includes(array, searchValue, fromIndex) {
+  var startSearch = 0
+
+  if(fromIndex > 0) {
+    startSearch = fromIndex;
+  }
+  if(fromIndex < 0) {
+    startSearch = array.length + fromIndex;
+  }
+
+  for(var i = startSearch; i < array.length; i++) {
+      if(array[i] === searchValue) {
+        return true;
+    }
+  }
+        return false;
+}
+
+tests({
+'It should return true if the searchValue is in the array.': function() {
+  var result = includes([1], 1);
+  eq(result, true);
+},
+'It should return false if the searchValue is not in the array.': function() {
+  var result = includes([1], 2);
+  eq(result, false);
+},
+'If fromIndex argument is not entered it should search the array starting at index 0.': function() {
+  var result = includes([1, 2], 1);
+  eq(result, true);
+},
+'If fromIndex is entered it should search the array starting at index[fromIndex].': function() {
+  var result = includes([1, 2], 1, 1);
+  eq(result, false);
+},
+'If fromIndex is negative it should start searching offset from the end of the array.': function() {
+  var result = includes([3, 2], 2, -1);
+  eq(result, true);
+},
+'If fromIndex >= array.length it should return false and not search the array.': function() {
+  var result = includes([1, 2], 2, 3);
+  eq(result, false);
+},
+'If fromIndex is negative and less than or equal to array.length the entire array will be searched.': function() {
+  var result = includes([1, 2], 2, -7);
+  eq(result, true);
+},
+'It should not skip holes.': function() {
+  var result = includes([,,,,], undefined);
+  eq(result, true);
+},
+'It should use strict equality to return result.': function() {
+  var result = includes([1, 2], '2');
+  eq(result, false);
+},
+'It should search array-like objects.': function () {
+    var testObject = {
+        0: 1,
+        1: 2,
+        length: 2
+      };
+    var result = includes(testObject, 1);
+    eq(result, true);  
+},
+});
+</script>
+</body>
+</html>

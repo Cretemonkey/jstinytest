@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Some Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.some(callback(element[, index[, array]])[, thisArg])
+
+//Parameters:
+// callback; A function to test for each element, taking three arguments:
+// element; The current element being processed in the array.
+// index [Optional]; The index of the current element being processed in the array.
+// array [Optional]; The array some() was called upon.
+// thisArgOptional; A value to use as this when executing callback.
+
+// Return value: true if the callback function returns a truthy value for at least one element in the array. Otherwise, false.
+
+//1. It should run callback originalArray.length times if no value is truthy.
+//2. It should pass in the ith element as the first argument to the callback.
+//3. It should pass in the ith position as the second argument to the callback.
+//4. It should pass in the originalArray as the third argument to the callback.
+//5. If a this argument is passed, it will be used as the this value inside each invocation of the callback.
+//6. It should run callback until an element is truthy and it will return true.
+//7. It should return false if no element is truthy.
+//8. It should return false for an empty array.
+//9. It should not run callback for any index with no assigned value.
+//10. It should not run callback for any element that has been deleted.
+//11. It should not run callback on elements added after some() has been called.
+//12. It should pass the value of existing elements that have been changed at the time callback visits them.
+
+function some(originalArray, callback, optionalThis) {
+  var someCallback = callback;
+  var length = originalArray.length;
+
+  if (optionalThis) {
+    someCallback = callback.bind(optionalThis);
+  };
+
+  for(var i = 0; i < length; i++) {
+
+    if (i in originalArray) {
+      if (callback(originalArray[i], i, originalArray)) {
+        return true;
+      };
+    }
+  }
+        return false;
+  };
+
+tests({
+'It should run callback originalArray.length times if no value is truthy.': function() {
+  var numberOfTimesCallbackRun = 0;
+
+  some([1, 2], function(element) {
+    numberOfTimesCallbackRun++;
+    return element > 2;
+  });
+    eq(numberOfTimesCallbackRun, 2);
+},
+'It should pass in the ith element as the first argument to the callback.': function() {
+  some([1], function(element) {
+    eq(element, 1);
+  });
+},
+'It should pass in the ith position as the second argument to the callback.': function() {
+  some([1], function(element, index) {
+    eq(index, 0);
+  });
+},
+'It should pass in the originalArray as the third argument to the callback.': function() {
+  var testArray = [1];
+
+  some(testArray, function(element, index, originalArray) {
+    eq(testArray, originalArray);
+  });
+},
+'If a this argument is passed, it will be used as the this value inside each invocation of the callback.': function() {
+  some([], function() {
+    eq(this.name, 'Mike');
+  }, {name:'Mike'});
+},
+'It should run callback only until an element is truthy and it will return true.': function() {
+  var numberOfTimesCallbackRun = 0;
+
+  var isSome = some([1, 2, 3], function(element) {
+    numberOfTimesCallbackRun++;
+    return element > 2;
+  });
+  eq(isSome, true);
+  eq(numberOfTimesCallbackRun, 3);
+},
+'It should return false if no element is truthy.': function() {
+  var isSome = some([1, 2], function(element) {
+    return element > 2;
+  });
+  eq(isSome, false);
+},
+'It should return false for an empty array.': function() {
+  var isSome = some([], function(element) {
+    return element > 1;
+  });
+  eq(isSome, false);
+},
+'It should not run callback for any index with no assigned value.': function() {
+  var numberOfTimesCallbackRun = 0;
+
+  some([ , 2], function(element) {
+    numberOfTimesCallbackRun++;
+    return element > 2;
+  });
+  eq(numberOfTimesCallbackRun, 1);
+},
+'It should not run callback for any element that has been deleted.': function() {
+  var numberOfTimesCallbackRun = 0;
+  var testArray = [1, 2];
+
+  some(testArray, function(element) {
+    numberOfTimesCallbackRun++;
+    testArray.splice(0,1);
+    return element > 2;
+  });
+  eq(numberOfTimesCallbackRun, 1);
+},
+'It should not run callback on elements added after some() has been called.': function() {
+  var numberOfTimesCallbackRun = 0;
+  var testArray = [1];
+
+  some(testArray, function(element) {
+    numberOfTimesCallbackRun++;
+    testArray.push(2);
+    return element > 2;
+  });
+  eq(numberOfTimesCallbackRun, 1);
+},
+'It should pass the value of existing elements that have been changed at the time callback visits them.': function() {
+  var testArray = [1];
+
+  var isSome = some(testArray, function(element) {
+    testArray[0] = 2;
+    return element > 1;
+  });
+  eq(isSome, false);
+},
+});
+
+</script>
+</body>
+</html>

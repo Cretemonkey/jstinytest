@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>reverse Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.reverse()
+
+// Return: The reversed array, not a copy.
+
+// It should reverse the order of elements in the array.
+// It should return the same array reversed, not a copy.
+// It should return any holes in the correct index of the array.
+// It should be able to be applied to objects resembling arrays.
+// It should be able to be called to objects resembling arrays.
+
+Array.prototype.reverseObj = function() {
+  var length = this.length;
+  var start = this[0];
+  
+    for(var i = 0; i < this.length; i++) { 
+
+      if (length > 1) {
+        this[i] = this[length -1];
+        length--;
+    }else{
+        this[i] = start;
+    }
+    }
+     return this;
+};
+
+tests({
+'It should reverse the order of elements in the array.': function() {
+  var testObj = [1, 2];
+  testObj.reverseObj();
+  eq(testObj[0], 2);
+  eq(testObj[1], 1);
+},
+'It should return the same array reversed, not a copy.': function() {
+  var testObj = [1, 2];
+  var result = testObj.reverseObj();
+  eq(testObj, result);
+},
+'It should return any holes in the correct index of the array.': function() {
+  var testObj = [ , 2];
+  testObj.reverseObj();
+  eq(testObj[1], undefined);
+},
+'It should be able to be applied to objects resembling arrays.': function() {
+  var testObj = {
+    0: 'mike',
+    1: 'bob',
+
+    length: 2,
+  }; 
+  Array.prototype.reverseObj.apply(testObj);
+  eq(testObj[0], 'bob');
+  eq(testObj[1], 'mike');
+},  
+'It should be able to be called to objects resembling arrays.': function() {
+  var testObj = {
+    0: 'mike',
+    1: 'bob',
+
+    length: 2,
+  }; 
+  Array.prototype.reverseObj.call(testObj);
+  eq(testObj[0], 'bob');
+  eq(testObj[1], 'mike');
+},  
+});
+</script>
+</body>
+</html>

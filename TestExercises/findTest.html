@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Find Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// The find() method returns the value of the first element in the provided array that satisfies the provided testing function.
+
+// Syntax: arr.find(callback(element[, index[, array]])[, thisArg])
+
+// Parameters: 
+// callback; Function to execute on each value in the array, taking 3 arguments:
+// element; The current element in the array.
+// index [Optional]; The index (position) of the current element in the array.
+// array [Optional]; The array that find was called on.
+// thisArg [Optional]; Object to use as this inside callback.
+
+// function find(array, callback(element, index, originalArray),thisValue)
+
+// 'If no element of originalArray is truthy, callback should run originalArray.length times'
+// 'It should execute the callback function for each element of originalArray only until the callback returns a truthy element.'
+// 'It should pass in the ith element as the first argument to the callback.'
+// 'It should pass in the ith position as the second argument to the callback.'
+// 'It should return the originalArray as the third argument.'
+// 'If a this argument is passed, it will be used as the this value inside each invocation of the callback.'
+// 'If no element of the originalArray is truthy, element should return undefined.'
+// 'It should return the value of the first element in originalArray that satisfies the function.'
+// 'It should run callback for every index of the originalArray including holes until the callback returns a truthy element.'
+// 'Callback will not visit any elements added to the array after the call to find() begins.'
+// 'It should still evaluate an element in originalArray that has been deleted after callback has been called.'
+// 'If the value of an element in originalArray is changed by callback before it is evaluated the new value will be passed.'
+
+function find(originalArray, callback, optionalThis) {
+  var findCallback = callback;
+  var length = originalArray.length;
+
+  if(optionalThis) {
+    findCallback = callback.bind(optionalThis);
+  }
+
+  for(var i = 0; i < length; i++) {
+    
+    if (callback(originalArray[i], i, originalArray)) {
+        return originalArray[i];
+    }
+  }
+};
+
+tests({
+'If no element of originalArray is truthy, callback should run originalArray.length times': function() {
+  var numberOfTimesCallbackHasRun = 0;
+  find([2, 1], function(element) {
+    numberOfTimesCallbackHasRun++;
+    return element > 3
+  });
+  eq(numberOfTimesCallbackHasRun, 2);
+},
+'It should execute the callback function for each element of originalArray only until the callback returns a truthy element.':
+function() {
+  var numberOfTimesCallbackHasRun = 0;
+  debugger;
+  find([2, 1], function(element) {
+    numberOfTimesCallbackHasRun++;
+    return element > 1;
+  });
+    eq(numberOfTimesCallbackHasRun, 1); 
+},
+'It should pass in the ith element as the first argument to the callback.': function() {
+    find([1], function(element) {
+      eq(element, 1);
+    });
+  },
+'It should pass in the ith position as the second argument to the callback.': function() {
+    find([1], function(element, index) {
+      eq(index, 0);
+    });
+},
+'It should return the originalArray as the third argument.':function() {
+  var findArray = [1, 2, 3];
+  find(findArray, function(element, index, originalArray) {
+      eq(findArray, originalArray);
+    });
+},
+'If a this argument is passed, it will be used as the this value inside each invocation of the callback.':function() {
+  find([], function() {
+    eq(this.name, 'Mike')
+  }, {name: 'Mike'});
+},
+'If no element of the originalArray is truthy, element should return undefined.':function() {
+  var findValue = find([1, 2], function(element) {
+    return element > 2 
+  });
+  eq(findValue, undefined);
+},
+'It should return the value of the first element in originalArray that returns truthy.':function() {
+  var numberOfTimesCallbackHasRun = 0;
+  var findValue = find([1, 2, 3], function(element) {
+    numberOfTimesCallbackHasRun++
+    if(element > 1) {
+      return element; 
+    }
+  });
+    eq(findValue, 2);
+    eq(numberOfTimesCallbackHasRun, 2);
+},
+'It should run callback for every index of the originalArray including holes until the callback returns a truthy element.':function() {
+  var findArray = [ ,2]
+  var numberOfTimesCallbackHasRun = 0
+  
+  find(findArray, function(element) {
+    numberOfTimesCallbackHasRun++;
+    return element > 1;
+  });
+    eq(0 in findArray, false);
+    eq(numberOfTimesCallbackHasRun, 2); 
+},
+'Callback will not visit any elements added to the array after the call to find() begins.':function() {
+  var numberOfTimesCallbackHasRun = 0;
+  var findArray = [1, 2];
+  
+  find(findArray, function(element) {
+    numberOfTimesCallbackHasRun++;
+    findArray.push(3);
+    return element > 4;
+  });
+    eq(numberOfTimesCallbackHasRun, 2);
+},
+'It should still evaluate an element in originalArray that has been deleted after callback has been called.':function() {
+  var numberOfTimesCallbackHasRun = 0;
+  var findArray = [1, 2];
+
+  find(findArray, function(element) {
+    numberOfTimesCallbackHasRun++;
+    findArray.splice(1, 1);
+    return element > 1;
+  });
+    eq(numberOfTimesCallbackHasRun, 2);
+},
+'If the value of an element in originalArray is changed by callback before it is evaluated the new value will be passed.':function() {
+  var findArray = [1, 2, 3];
+
+  var findValue = find(findArray, function(element) {
+    findArray[2] = 4;
+    return element > 3;
+  });
+    eq(findValue, 4);
+},
+});
+
+</script>
+</body>
+</html>

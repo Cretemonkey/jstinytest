@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>pop Method Test</title>
+  </head>
+  <body>
+<script src="../simpleTest.js"></script>
+<script>
+
+// Syntax: arr.pop()
+
+// Return: The removed element from the array; undefined if the array is empty.
+
+// It should remove the last element from an array.
+// It should return the removed element from the array.
+// It should return undefined if the array is empty.
+// It should be able to use .apply on objects resembling arrays. 
+// It should be able to use .call on objects resembling arrays.
+
+Array.prototype.popThis = function() {
+  var length = this.length;
+  var popValue = this[length -1];
+
+  if (this.length < 1) {
+    return popValue;
+  }
+  this.length = this.length -1;
+
+  return popValue;
+};  
+
+tests({
+'It should remove the last element from an array.': function() {
+  var testArray = [2, 3];
+  testArray.popThis();
+  eq(testArray, 2);
+},
+'It should return the removed element from the array.': function() {   
+  var testArray = [2, 3];
+  var result = testArray.popThis();
+  eq(result, 3);
+},
+'It should return undefined if the array is empty.': function() {
+  var testArray = [];
+  var result = testArray.popThis();
+  eq(result, undefined);
+},
+'It should be able to use .apply on objects resembling arrays.': function() {
+  var myObj = {
+    0: 'mike',
+    1: 'george',
+    length: 2,
+  };
+  var popApply = Array.prototype.popThis.apply(myObj);
+  eq(popApply, 'george');
+},
+'It should be able to use .call on objects resembling arrays.': function() {
+   var myObj = {
+    0: 'mike',
+    1: 'george',
+    length: 2,
+  };
+  var popCall = Array.prototype.popThis.call(myObj);
+  eq(popCall, 'george');
+},
+});
+</script>
+</body>
+</html>
